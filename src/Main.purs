@@ -47,8 +47,8 @@ allsWell = s "All's well."
 
 decks :: Array ChanceDeck
 decks = [
-    { title: "Sea", cards: [allsWell, allsWell, s "Rats eat one point of stores"]},
-    { title: "Storms", cards: [allsWell, s "Mast Damaged, miss a turn", s "One point of stores lost overboard.", blownOffCourse]},
+    { title: "Sea", cards: [allsWell, allsWell, s "Rats eat one point of stores", s "blackmail mutiny - 1 point of stores", s "hit a rock miss a turn"]},
+    { title: "Storms", cards: [allsWell, s "Mast Damaged, miss a turn", s "One point of stores lost overboard.", blownOffCourse, s "hit a rock miss a turn"]},
     { title: "Island", cards: [s "Replenished supplies.", s "Ran aground, miss a turn."]}
     ]
 
