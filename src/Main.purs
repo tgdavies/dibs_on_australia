@@ -15,10 +15,11 @@ import Data.Int
 import Control.Monad.Eff
 import Control.Monad.Eff.Console
 import Control.Monad.Eff.Random
-import Control.Bind
-
 import Control.Monad.Eff.DOM
 import Control.Monad.Eff.AUI
+import Control.Bind
+
+
 
 type ChanceDeck = { title :: String, cards :: Array String }
 

@@ -711,7 +711,7 @@ var PS = { };
           })(Prelude.unit)(decks)();
           return Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit)();
       };
-      throw new Error("Failed pattern match at Main line 65, column 1 - line 66, column 1: " + [ _5.constructor.name ]);
+      throw new Error("Failed pattern match at Main line 66, column 1 - line 67, column 1: " + [ _5.constructor.name ]);
   };
   var main = function __do() {
       Control_Monad_Eff_Console.log("Attaching event handlers")();
