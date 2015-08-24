@@ -736,7 +736,7 @@ var PS = { };
                   var _11 = state.p - a.probability < 0.0;
                   if (_11) {
                       return {
-                          p: state.p, 
+                          p: -1.0, 
                           i: state.i
                       };
                   };
@@ -746,7 +746,7 @@ var PS = { };
                           i: state.i + 1 | 0
                       };
                   };
-                  throw new Error("Failed pattern match at Main line 79, column 1 - line 80, column 1: " + [ _11.constructor.name ]);
+                  throw new Error("Failed pattern match at Main line 80, column 1 - line 81, column 1: " + [ _11.constructor.name ]);
               };
           })({
               p: p, 
@@ -764,7 +764,7 @@ var PS = { };
               if (_12 instanceof Data_Maybe.Just) {
                   return _12.value0;
               };
-              throw new Error("Failed pattern match at Main line 74, column 1 - line 79, column 1: " + [ _12.constructor.name ]);
+              throw new Error("Failed pattern match at Main line 75, column 1 - line 80, column 1: " + [ _12.constructor.name ]);
           };
       };
   };
@@ -851,7 +851,7 @@ var PS = { };
           })(Prelude.unit)(decks)();
           return Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit)();
       };
-      throw new Error("Failed pattern match at Main line 100, column 1 - line 105, column 1: " + [ _9.constructor.name ]);
+      throw new Error("Failed pattern match at Main line 101, column 1 - line 106, column 1: " + [ _9.constructor.name ]);
   };
   var main = renderDecks;
   exports["main"] = main;

@@ -62,6 +62,7 @@ button title = do
     return node
 
 --render :: forall eff. Node -> ChanceDeck eff -> Eff (dom :: DOM, random :: RANDOM | eff) Unit
+render :: forall t171. Node -> { title :: String, cards :: Array { text :: Eff (random :: RANDOM, dom :: DOM | t171) String, probability :: Number }} -> Eff (random :: RANDOM, dom :: DOM | t171) Unit
 render node deck = do
     buttonNode <- button deck.title
     deckDiv <- createElement "p"
@@ -78,7 +79,7 @@ indexWithDefault as i default =
 
 probabilityToIndex :: forall r. Array { probability :: Number | r } -> Number -> Int
 probabilityToIndex as p =
-    (foldl (\state a -> if state.p - a.probability < 0.0 then {p: state.p, i:state.i} else {p: state.p - a.probability, i: state.i+1}) {p: p, i:0} as).i
+    (foldl (\state a -> if state.p - a.probability < 0.0 then {p: -1.0, i:state.i} else {p: state.p - a.probability, i: state.i+1}) {p: p, i:0} as).i
 
 --chooseCard :: forall eff. ChanceDeck eff -> Number -> Eff (random :: RANDOM | eff) String
 chooseCard deck n =
