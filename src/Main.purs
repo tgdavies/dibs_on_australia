@@ -4,7 +4,6 @@ import Prelude
 
 import DOM
 
-
 import Data.Maybe
 import Data.Array
 import Data.Either
@@ -20,20 +19,20 @@ import Control.Monad.Eff.DOM
 import Control.Monad.Eff.AUI
 import Control.Bind
 
-type ChanceCard eff = { probability :: Number, text :: Eff eff String }
+data ChanceCard eff = ChanceCard { probability :: Number, text :: Eff eff String }
 
-type ChanceDeck eff = { title :: String, cards :: Array (ChanceCard eff) }
+data ChanceDeck eff = ChanceDeck { title :: String, cards :: Array (ChanceCard eff) }
 
-totalProbability :: forall r. Array {probability :: Number | r} -> Number
+totalProbability :: forall eff. Array (ChanceCard eff) -> Number
 totalProbability cards =
-    foldl (\sum c -> sum + c.probability) (0.0 :: Number) cards
+    foldl (\sum (ChanceCard c) -> sum + c.probability) (0.0 :: Number) cards
 
 s :: forall eff. String -> Eff eff String
 s str = do
     return str
 
 card :: forall eff. Number -> Eff eff String -> ChanceCard eff
-card p t = {probability: p, text: t}
+card p t = ChanceCard {probability: p, text: t}
 
 randomI n = do
     r <- random
@@ -44,14 +43,45 @@ blownOffCourse = do
     distance <- randomI 5
     return ("Blown off course, go " ++ (show $ distance + 1) ++ " hexes in direction " ++ (show $ direction + 1))
 
-allsWell p = {probability: p, text: s "All's well."}
+allsWell p = ChanceCard {probability: p, text: s "All's well."}
 
 
 --decks ::  forall eff. Array (ChanceDeck eff)
 decks = [
-    { title: "Sea", cards: [allsWell 80.0, card 5.0 (s "Rats eat one point of stores"), card 5.0 (s "blackmail mutiny - 1 point of stores"), card 5.0 (s "hit a rock miss a turn")]},
-    { title: "Storms", cards: [allsWell 50.0, card 10.0 (s "Mast Damaged, miss a turn"), card 10.0 (s "One point of stores lost overboard."), card 30.0 blownOffCourse, card 5.0 (s "hit a rock miss a turn")]},
-    { title: "Island", cards: [card 50.0 (s "Replenished supplies."), card 25.0 (s "Ran aground, miss a turn.")]}
+    ChanceDeck {
+        title: "Sea",
+        cards: [
+            allsWell 80.0,
+            card 5.0 (s "Rats eat one point of stores"),
+            card 5.0 (s "blackmail mutiny - 1 point of stores"),
+            card 5.0 (s "hit a rock miss a turn")
+        ]
+    },
+    ChanceDeck {
+        title: "Storms",
+        cards: [
+            allsWell 40.0,
+            card 10.0 (s "Mast Damaged, miss a turn"),
+            card 10.0 (s "One point of stores lost overboard."),
+            card 30.0 blownOffCourse,
+            card 5.0 (s "hit a rock miss a turn")
+        ]
+    },
+    ChanceDeck {
+        title: "Island",
+        cards: [
+            card 50.0 (s "Replenished supplies."),
+            card 25.0 (s "Ran aground, miss a turn.")
+        ]
+    },
+    ChanceDeck {
+        title: "Reef",
+        cards: [
+            allsWell 50.0,
+            card 25.0 (s "Hit a reef, miss a turn"),
+            card 25.0 (s "Hit a reef, one point of stores lost.")
+        ]
+    }
     ]
 
 button :: forall eff. String -> Eff (dom :: DOM | eff) Node
@@ -62,32 +92,36 @@ button title = do
     return node
 
 --render :: forall eff. Node -> ChanceDeck eff -> Eff (dom :: DOM, random :: RANDOM | eff) Unit
-render :: forall t171. Node -> { title :: String, cards :: Array { text :: Eff (random :: RANDOM, dom :: DOM | t171) String, probability :: Number }} -> Eff (random :: RANDOM, dom :: DOM | t171) Unit
-render node deck = do
-    buttonNode <- button deck.title
-    deckDiv <- createElement "p"
-    appendChild buttonNode deckDiv
-    appendChild deckDiv node
-    addEventListener "click" (showCard deck deckDiv) buttonNode
-    return unit
+--render :: forall t171. Node -> { title :: String, cards :: Array { text :: Eff (random :: RANDOM, dom :: DOM | t171) String, probability :: Number }} -> Eff (random :: RANDOM, dom :: DOM | t171) Unit
+render node deck =
+    let
+        title (ChanceDeck d) = d.title
+    in do
+        buttonNode <- button (title deck)
+        deckDiv <- createElement "p"
+        appendChild buttonNode deckDiv
+        appendChild deckDiv node
+        addEventListener "click" (showCard deck deckDiv) buttonNode
+        return unit
 
---indexWithDefault :: forall a. Array a -> Int -> a -> a
+indexWithDefault :: forall a. Array a -> Int -> a -> a
 indexWithDefault as i default =
     case index as i of
         Nothing -> default
         Just a -> a
 
-probabilityToIndex :: forall r. Array { probability :: Number | r } -> Number -> Int
+probabilityToIndex :: forall eff. Array (ChanceCard eff) -> Number -> Int
 probabilityToIndex as p =
-    (foldl (\state a -> if state.p - a.probability < 0.0 then {p: -1.0, i:state.i} else {p: state.p - a.probability, i: state.i+1}) {p: p, i:0} as).i
+    (foldl (\state (ChanceCard a) -> if state.p - a.probability < 0.0 then {p: -1.0, i:state.i} else {p: state.p - a.probability, i: state.i+1}) {p: p, i:0} as).i
 
 --chooseCard :: forall eff. ChanceDeck eff -> Number -> Eff (random :: RANDOM | eff) String
-chooseCard deck n =
+chooseCard (ChanceDeck deck) n =
     let
         total = totalProbability deck.cards
         i = probabilityToIndex deck.cards (total * n)
+        getText (ChanceCard c) = c.text
     in
-        (indexWithDefault deck.cards i (card 0.0 (s "error"))).text
+        getText (indexWithDefault deck.cards i (card 0.0 (s "error")))
 
 --showCard :: forall eff. ChanceDeck eff -> Node -> Eff (dom :: DOM, random :: RANDOM | eff) Unit
 showCard deck node = do

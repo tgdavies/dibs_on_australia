@@ -713,10 +713,28 @@ var PS = { };
   var Control_Monad_Eff = PS["Control.Monad.Eff"];
   var Control_Monad_Eff_Console = PS["Control.Monad.Eff.Console"];
   var Control_Bind = PS["Control.Bind"];     
+  var ChanceCard = (function () {
+      function ChanceCard(value0) {
+          this.value0 = value0;
+      };
+      ChanceCard.create = function (value0) {
+          return new ChanceCard(value0);
+      };
+      return ChanceCard;
+  })();
+  var ChanceDeck = (function () {
+      function ChanceDeck(value0) {
+          this.value0 = value0;
+      };
+      ChanceDeck.create = function (value0) {
+          return new ChanceDeck(value0);
+      };
+      return ChanceDeck;
+  })();
   var totalProbability = function (cards) {
       return Data_Foldable.foldl(Data_Foldable.foldableArray)(function (sum) {
-          return function (c) {
-              return sum + c.probability;
+          return function (_10) {
+              return sum + _10.value0.probability;
           };
       })(0.0)(cards);
   };
@@ -732,21 +750,21 @@ var PS = { };
   var probabilityToIndex = function (as) {
       return function (p) {
           return (Data_Foldable.foldl(Data_Foldable.foldableArray)(function (state) {
-              return function (a) {
-                  var _11 = state.p - a.probability < 0.0;
-                  if (_11) {
+              return function (_11) {
+                  var _19 = state.p - _11.value0.probability < 0.0;
+                  if (_19) {
                       return {
                           p: -1.0, 
                           i: state.i
                       };
                   };
-                  if (!_11) {
+                  if (!_19) {
                       return {
-                          p: state.p - a.probability, 
+                          p: state.p - _11.value0.probability, 
                           i: state.i + 1 | 0
                       };
                   };
-                  throw new Error("Failed pattern match at Main line 80, column 1 - line 81, column 1: " + [ _11.constructor.name ]);
+                  throw new Error("Failed pattern match at Main line 113, column 1 - line 114, column 1: " + [ _19.constructor.name ]);
               };
           })({
               p: p, 
@@ -757,30 +775,33 @@ var PS = { };
   var indexWithDefault = function (as) {
       return function (i) {
           return function ($$default) {
-              var _12 = Data_Array.index(as)(i);
-              if (_12 instanceof Data_Maybe.Nothing) {
+              var _21 = Data_Array.index(as)(i);
+              if (_21 instanceof Data_Maybe.Nothing) {
                   return $$default;
               };
-              if (_12 instanceof Data_Maybe.Just) {
-                  return _12.value0;
+              if (_21 instanceof Data_Maybe.Just) {
+                  return _21.value0;
               };
-              throw new Error("Failed pattern match at Main line 75, column 1 - line 80, column 1: " + [ _12.constructor.name ]);
+              throw new Error("Failed pattern match at Main line 107, column 1 - line 108, column 1: " + [ _21.constructor.name ]);
           };
       };
   };
   var card = function (p) {
       return function (t) {
-          return {
+          return new ChanceCard({
               probability: p, 
               text: t
-          };
+          });
       };
   };
-  var chooseCard = function (deck) {
+  var chooseCard = function (_12) {
       return function (n) {
-          var total = totalProbability(deck.cards);
-          var i = probabilityToIndex(deck.cards)(total * n);
-          return (indexWithDefault(deck.cards)(i)(card(0.0)(s("error")))).text;
+          var total = totalProbability(_12.value0.cards);
+          var i = probabilityToIndex(_12.value0.cards)(total * n);
+          var getText = function (_14) {
+              return _14.value0.text;
+          };
+          return getText(indexWithDefault(_12.value0.cards)(i)(card(0.0)(s("error"))));
       };
   };
   var showCard = function (deck) {
@@ -810,8 +831,11 @@ var PS = { };
   };
   var render = function (node) {
       return function (deck) {
+          var title = function (_13) {
+              return _13.value0.title;
+          };
           return function __do() {
-              var _5 = button(deck.title)();
+              var _5 = button(title(deck))();
               var _4 = Control_Monad_Eff_DOM.createElement("p")();
               Control_Monad_Eff_DOM.appendChild(_5)(_4)();
               Control_Monad_Eff_DOM.appendChild(_4)(node)();
@@ -826,21 +850,24 @@ var PS = { };
       return Prelude["return"](Control_Monad_Eff.applicativeEff)("Blown off course, go " + (Prelude.show(Prelude.showInt)(_1 + 1 | 0) + (" hexes in direction " + Prelude.show(Prelude.showInt)(_2 + 1 | 0))))();
   };
   var allsWell = function (p) {
-      return {
+      return new ChanceCard({
           probability: p, 
           text: s("All's well.")
-      };
+      });
   };
-  var decks = [ {
+  var decks = [ new ChanceDeck({
       title: "Sea", 
       cards: [ allsWell(80.0), card(5.0)(s("Rats eat one point of stores")), card(5.0)(s("blackmail mutiny - 1 point of stores")), card(5.0)(s("hit a rock miss a turn")) ]
-  }, {
+  }), new ChanceDeck({
       title: "Storms", 
-      cards: [ allsWell(50.0), card(10.0)(s("Mast Damaged, miss a turn")), card(10.0)(s("One point of stores lost overboard.")), card(30.0)(blownOffCourse), card(5.0)(s("hit a rock miss a turn")) ]
-  }, {
+      cards: [ allsWell(40.0), card(10.0)(s("Mast Damaged, miss a turn")), card(10.0)(s("One point of stores lost overboard.")), card(30.0)(blownOffCourse), card(5.0)(s("hit a rock miss a turn")) ]
+  }), new ChanceDeck({
       title: "Island", 
       cards: [ card(50.0)(s("Replenished supplies.")), card(25.0)(s("Ran aground, miss a turn.")) ]
-  } ];
+  }), new ChanceDeck({
+      title: "Reef", 
+      cards: [ allsWell(50.0), card(25.0)(s("Hit a reef, miss a turn")), card(25.0)(s("Hit a reef, one point of stores lost.")) ]
+  }) ];
   var renderDecks = function __do() {
       var _9 = Control_Monad_Eff_DOM.querySelector("#chanceContainer")();
       if (_9 instanceof Data_Maybe.Just) {
@@ -851,9 +878,11 @@ var PS = { };
           })(Prelude.unit)(decks)();
           return Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit)();
       };
-      throw new Error("Failed pattern match at Main line 101, column 1 - line 106, column 1: " + [ _9.constructor.name ]);
+      throw new Error("Failed pattern match at Main line 135, column 1 - line 140, column 1: " + [ _9.constructor.name ]);
   };
   var main = renderDecks;
+  exports["ChanceDeck"] = ChanceDeck;
+  exports["ChanceCard"] = ChanceCard;
   exports["main"] = main;
   exports["renderDecks"] = renderDecks;
   exports["showCard"] = showCard;
