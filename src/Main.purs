@@ -81,7 +81,17 @@ decks = [
             card 25.0 (s "Hit a reef, miss a turn"),
             card 25.0 (s "Hit a reef, one point of stores lost.")
         ]
-    }
+    },
+    ChanceDeck {
+        title: "Pirates",
+        cards: [
+            allsWell 50.0,
+            card 10.0 (s "Pirates plunder one point of stores."),
+            card 10.0 (s "Pirates plunder two points of stores."),
+            card 10.0 (s "Pirates board your ship, miss a turn."),
+            card 10.0 (s "Cannon fire damages hull, miss a turn.")
+        ]
+        }
     ]
 
 button :: forall eff. String -> Eff (dom :: DOM | eff) Node

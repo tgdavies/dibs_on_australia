@@ -764,7 +764,7 @@ var PS = { };
                           i: state.i + 1 | 0
                       };
                   };
-                  throw new Error("Failed pattern match at Main line 113, column 1 - line 114, column 1: " + [ _19.constructor.name ]);
+                  throw new Error("Failed pattern match at Main line 123, column 1 - line 124, column 1: " + [ _19.constructor.name ]);
               };
           })({
               p: p, 
@@ -782,7 +782,7 @@ var PS = { };
               if (_21 instanceof Data_Maybe.Just) {
                   return _21.value0;
               };
-              throw new Error("Failed pattern match at Main line 107, column 1 - line 108, column 1: " + [ _21.constructor.name ]);
+              throw new Error("Failed pattern match at Main line 117, column 1 - line 118, column 1: " + [ _21.constructor.name ]);
           };
       };
   };
@@ -867,6 +867,9 @@ var PS = { };
   }), new ChanceDeck({
       title: "Reef", 
       cards: [ allsWell(50.0), card(25.0)(s("Hit a reef, miss a turn")), card(25.0)(s("Hit a reef, one point of stores lost.")) ]
+  }), new ChanceDeck({
+      title: "Pirates", 
+      cards: [ allsWell(50.0), card(10.0)(s("Pirates plunder one point of stores.")), card(10.0)(s("Pirates plunder two points of stores.")), card(10.0)(s("Pirates board your ship, miss a turn.")), card(10.0)(s("Cannon fire damages hull, miss a turn.")) ]
   }) ];
   var renderDecks = function __do() {
       var _9 = Control_Monad_Eff_DOM.querySelector("#chanceContainer")();
@@ -878,7 +881,7 @@ var PS = { };
           })(Prelude.unit)(decks)();
           return Prelude["return"](Control_Monad_Eff.applicativeEff)(Prelude.unit)();
       };
-      throw new Error("Failed pattern match at Main line 135, column 1 - line 140, column 1: " + [ _9.constructor.name ]);
+      throw new Error("Failed pattern match at Main line 145, column 1 - line 150, column 1: " + [ _9.constructor.name ]);
   };
   var main = renderDecks;
   exports["ChanceDeck"] = ChanceDeck;
